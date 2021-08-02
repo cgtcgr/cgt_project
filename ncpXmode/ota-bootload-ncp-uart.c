@@ -156,11 +156,11 @@ static bool checkForXmodemStart(void)
 bool emAfBootloadSendData(const uint8_t *data, uint16_t length)
 {
   printf("emAfBootloadSendData >>>>>>>>>>>>>>>>>>>>> %d\n",length);
-  for(int i = 0 ; i < length; i++)
-  {
-		printf("%02x  ",data[i]);
-  }
-  printf("\n emAfBootloadSendData <<<<<<<<<<<<<<<<<<<<<\n");
+  // for(int i = 0 ; i < length; i++)
+  // {
+	// 	printf("%02x  ",data[i]);
+  // }
+  // printf("\n emAfBootloadSendData <<<<<<<<<<<<<<<<<<<<<\n");
 
   for(int i = 0 ; i < length; i++)
   {

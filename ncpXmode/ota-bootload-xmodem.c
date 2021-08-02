@@ -133,7 +133,7 @@ bool emAfSendXmodemData(const uint8_t *data, int length, bool finished)
       dataBuff[buffFinger++] = data[i];
       if (buffFinger >= DATA_SIZE) 
       {
-        usleep(100000);
+        usleep(10000);
         printf("block start %d %d %d\n", blockNum,i,length);        //fsync();
   
         if (!sendBlock(blockNum, dataBuff)) 

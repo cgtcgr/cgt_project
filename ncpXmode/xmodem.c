@@ -249,7 +249,7 @@ int main()
 	if(emberAfOtaBootloadCallback())
 	{
 		printf("restart ncp \n");
-		//exitNcp();
+		exitNcp();
 	}
 	return 1;
 }
