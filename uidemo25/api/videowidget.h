@@ -168,6 +168,7 @@ private:
     std::vector<struct_TerminalList> m_vTermList;
     int maxy;
     int maxx;
+    int cameraId;
 
 
 private:
@@ -232,6 +233,7 @@ public:
     QSize sizeHint()                const;
     QSize minimumSizeHint()         const;
     void  newFrameEmit(int intCameraTemperature, DWORD dwCamState);
+    void setCameraId(int id);
 public slots:
     //接收图像并绘制
     void updateImage(const QImage &image);

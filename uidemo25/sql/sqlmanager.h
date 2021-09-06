@@ -6,6 +6,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
+#include "QsLog.h"
 class sqlManager :public QObject
 {
     Q_OBJECT
@@ -25,11 +26,10 @@ public:
 
     bool openDatabase()
     {
-
         bool isOpen = false;
         isOpen = m_database.open();
-        qDebug()<<"DataBase is Open ?"<<isOpen;
-        qDebug()<<"Open file: "<<m_database.databaseName()<<" sucessfully!";
+        QLOG_INFO()<<"DataBase is Open ?"<<isOpen;
+        QLOG_INFO()<<"Open file: "<<m_database.databaseName()<<" sucessfully!";
         return isOpen;
     }
 
@@ -37,13 +37,13 @@ public:
     {
         //创建表格
         QSqlQuery query(m_database);
-        if(!query.exec("create table taskResult(id INTEGER PRIMARY KEY autoincrement, time nvarchar(50), taskPointName text, startTime int, upT int,downT int,result bool)"))
+        if(!query.exec("create table taskResult(id INTEGER PRIMARY KEY autoincrement, time nvarchar(50), taskPointName text, startTime int, upT int,downT int,result nvarchar(10))"))
         {
-            //qDebug() << "Error: Fail to create table."<< sql_query.lastError();
+            //QLOG_INFO() << "Error: Fail to create table."<< sql_query.lastError();
         }
         if(!query.exec("create table taskInfo(id INTEGER PRIMARY KEY autoincrement, taskPointName text, devpos int, cameraLeftPos int,cameraRightPos int)"))
         {
-            //qDebug() << "Error: Fail to create table."<< sql_query.lastError();
+            //QLOG_INFO() << "Error: Fail to create table."<< sql_query.lastError();
         }
         return true;
     }
@@ -55,6 +55,7 @@ public:
     */
     bool insertData(const QString& table, QStringList& names, QStringList& values)
     {
+        QLOG_INFO()<<"insertData";
         if (names.size() != values.size())
         {
             return false;
@@ -87,9 +88,9 @@ public:
         sql += QString(")");
         //INSERT INTO Teachers(Name) Values('张三');
         //sql= "INSERT INTO new_test(Port),Values('2011');";
-        qDebug()<<sql;
+        QLOG_INFO()<<sql;
         bool ok=query.exec(sql);
-        qDebug()<<"Insert data:"<<ok;
+        QLOG_INFO()<<"Insert data:"<<ok;
         //m_database.close();
         if (ok)
         {
@@ -158,9 +159,9 @@ public:
     {
         QSqlQuery query(m_database);
         QString sql = QString("select * from %1 ;").arg(table);
-        qDebug()<<sql;
+        QLOG_INFO()<<sql;
         bool ok=query.exec(sql);
-        qDebug()<<ok;
+        QLOG_INFO()<<ok;
 
         while (query.next())
         {
@@ -169,7 +170,7 @@ public:
                 values << query.value(i).toString();
             }
         }
-        qDebug()<<values;
+        QLOG_INFO()<<values;
         //m_database.close();
     }
 
@@ -177,19 +178,22 @@ public:
     {
         QSqlQuery query(m_database);
         //QString sql = QString("delete from taskInfo ");
-        QString sql = QString("select * from taskInfo ")+ QString(" where time BETWEEN '%1' and '%2' AND taskPointName= '%3'").arg(start).arg(end).arg(name);
+        QString sql = QString("select * from taskResult ")+ QString(" where time BETWEEN '%1' and '%2' AND taskPointName= '%3'").arg(start).arg(end).arg(name);
+        QLOG_INFO()<<sql;
         qDebug()<<sql;
         bool ok=query.exec(sql);
+        QLOG_INFO()<<ok;
         qDebug()<<ok;
-
         while (query.next())
         {
+            qDebug()<<"oknext";
             for(int i = 0; i< 7 ;i++)
             {
                 values << query.value(i).toString();
+                qDebug()<<"oknext"<<query.value(i).toString();
             }
         }
-        qDebug()<<values;
+        QLOG_INFO()<<values;
         //m_database.close();
     }
 private:
@@ -205,58 +209,58 @@ private:
     database.setDatabaseName("MyDataBase.db");
     if (!database.open())
     {
-        qDebug() << "Error: Failed to connect database." << database.lastError();
+        QLOG_INFO() << "Error: Failed to connect database." << database.lastError();
     }
     else
     {
-        qDebug() << "Succeed to connect database." ;
+        QLOG_INFO() << "Succeed to connect database." ;
     }
 
     //创建表格
     QSqlQuery sql_query;
     if(!sql_query.exec("create table student(id int primary key, name text, age int)"))
     {
-        qDebug() << "Error: Fail to create table."<< sql_query.lastError();
+        QLOG_INFO() << "Error: Fail to create table."<< sql_query.lastError();
     }
     else
     {
-        qDebug() << "Table created!";
+        QLOG_INFO() << "Table created!";
     }
 
     //插入数据
     if(!sql_query.exec("INSERT INTO student VALUES(1, \"Wang\", 23)"))
     {
-        qDebug() << sql_query.lastError();
+        QLOG_INFO() << sql_query.lastError();
     }
     else
     {
-        qDebug() << "inserted Wang!";
+        QLOG_INFO() << "inserted Wang!";
     }
     if(!sql_query.exec("INSERT INTO student VALUES(2, \"Li\", 23)"))
     {
-        qDebug() << sql_query.lastError();
+        QLOG_INFO() << sql_query.lastError();
     }
     else
     {
-        qDebug() << "inserted Li!";
+        QLOG_INFO() << "inserted Li!";
     }
 
     //修改数据
     sql_query.exec("update student set name = \"QT\" where id = 1");
     if(!sql_query.exec())
     {
-        qDebug() << sql_query.lastError();
+        QLOG_INFO() << sql_query.lastError();
     }
     else
     {
-        qDebug() << "updated!";
+        QLOG_INFO() << "updated!";
     }
 
     //查询数据
     sql_query.exec("select * from student");
     if(!sql_query.exec())
     {
-        qDebug()<<sql_query.lastError();
+        QLOG_INFO()<<sql_query.lastError();
     }
     else
     {
@@ -265,7 +269,7 @@ private:
             int id = sql_query.value(0).toInt();
             QString name = sql_query.value(1).toString();
             int age = sql_query.value(2).toInt();
-            qDebug()<<QString("id:%1    name:%2    age:%3").arg(id).arg(name).arg(age);
+            QLOG_INFO()<<QString("id:%1    name:%2    age:%3").arg(id).arg(name).arg(age);
         }
     }
 
@@ -273,22 +277,22 @@ private:
     sql_query.exec("delete from student where id = 1");
     if(!sql_query.exec())
     {
-        qDebug()<<sql_query.lastError();
+        QLOG_INFO()<<sql_query.lastError();
     }
     else
     {
-        qDebug()<<"deleted!";
+        QLOG_INFO()<<"deleted!";
     }
 
     //删除表格
     sql_query.exec("drop table student");
     if(sql_query.exec())
     {
-        qDebug() << sql_query.lastError();
+        QLOG_INFO() << sql_query.lastError();
     }
     else
     {
-        qDebug() << "table cleared";
+        QLOG_INFO() << "table cleared";
     }
 
     //关闭数据库

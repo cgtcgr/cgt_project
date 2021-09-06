@@ -100,7 +100,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>联系电话：0571-87235766</string>
+        <string>联系电话：</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -150,7 +150,7 @@
         <enum>Qt::DefaultContextMenu</enum>
        </property>
        <property name="text">
-        <string>浙江华睿科技有限公司</string>
+        <string>众巡科技有限公司</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -239,7 +239,7 @@
      <item>
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>公司地：浙江省杭州市滨江区滨安路1181号</string>
+        <string>公司地：</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -292,7 +292,7 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>www.huaraytech.com</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

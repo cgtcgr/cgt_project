@@ -8,7 +8,11 @@
 #include "qtimer.h"
 #include "qdebug.h"
 #include "QsLog.h"
-
+#include "mount/commonconfig.h"
+#include "task/taskresult.h"
+#include <QGuiApplication>
+#include <QScreen>
+#include <QTime>
 void CALLBACK NewFrame(UINT intChannelIndex, int intCameraTemperature,
                        DWORD dwFFCCounterdown, DWORD dwCamState,
                        DWORD dwStreamType, void * pUser)
@@ -36,9 +40,23 @@ VideoPanel::VideoPanel(QWidget *parent) : QWidget(parent)
     this->initForm();
     this->initMenu();
     this->show_video_all();
+    connect(TaskResult::GetInstance(),SIGNAL(sendSaveTaskPic(QString,QString))
+            ,this,SLOT( recvSaveTaskPic(QString ,QString )));
     QTimer::singleShot(1000, this, SLOT(play_video_all()));
 }
+void VideoPanel::recvSaveTaskPic(QString name,QString time1)
+{
+    QLOG_INFO()<<"VideoPanel::recvSaveTaskPic";
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QDateTime current_date_time =QDateTime::currentDateTime();
+    QString time = current_date_time.toString("yyyy-MM-dd hh-mm-ss");
 
+    for (int i = 0; i < videoCount; i++) {
+        QString picName = CommonConfig::GetInstance()->storagePic+name+time+"~"+QString::number(i)+".png";
+         QLOG_INFO()<<"snapshot_video_all"<<i<<picName;
+        screen->grabWindow(widgets.at(i)->winId ()).save(picName);
+    }
+}
 bool VideoPanel::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonDblClick) {
@@ -108,11 +126,13 @@ void VideoPanel::initForm()
         //cameraLink::GetInstance()->play(widget,i);
         if(i == 0)
         {
-            widget->linkCamera("200.120.72.167");
+            widget->setCameraId(0);
+            widget->linkCamera(CommonConfig::GetInstance()->cameraLIP);
         }
         else
         {
-            widget->linkCamera("200.120.72.168");
+            widget->setCameraId(1);
+            widget->linkCamera(CommonConfig::GetInstance()->cameraRIP);
         }
         play(widget);
     }
@@ -141,20 +161,20 @@ void VideoPanel::initMenu()
 {
     videoMenu = new QMenu(this);
 
-    actionFull = new QAction("切换全屏模式", videoMenu);
-    connect(actionFull, SIGNAL(triggered(bool)), this, SLOT(full()));
-    actionPoll = new QAction("启动轮询视频", videoMenu);
-    connect(actionPoll, SIGNAL(triggered(bool)), this, SLOT(poll()));
+   // actionFull = new QAction("切换全屏模式", videoMenu);
+    //connect(actionFull, SIGNAL(triggered(bool)), this, SLOT(full()));
+    //actionPoll = new QAction("启动轮询视频", videoMenu);
+    //connect(actionPoll, SIGNAL(triggered(bool)), this, SLOT(poll()));
 
-    videoMenu->addAction(actionFull);
-    videoMenu->addAction(actionPoll);
-    videoMenu->addSeparator();
+    //videoMenu->addAction(actionFull);
+    //videoMenu->addAction(actionPoll);
+    //videoMenu->addSeparator();
 
-    videoMenu->addAction("截图当前视频", this, SLOT(snapshot_video_one()));
+   // videoMenu->addAction("截图当前视频", this, SLOT(snapshot_video_one()));
     videoMenu->addAction("截图所有视频", this, SLOT(snapshot_video_all()));
     videoMenu->addSeparator();
 
-    QMenu *menu4 = videoMenu->addMenu("切换到4画面");
+    /*QMenu *menu4 = videoMenu->addMenu("切换到4画面");
     menu4->addAction("通道1-通道4", this, SLOT(show_video_4()));
     menu4->addAction("通道5-通道8", this, SLOT(show_video_4()));
     menu4->addAction("通道9-通道12", this, SLOT(show_video_4()));
@@ -181,6 +201,7 @@ void VideoPanel::initMenu()
     videoMenu->addAction("切换到25画面", this, SLOT(show_video_25()));
     videoMenu->addAction("切换到36画面", this, SLOT(show_video_36()));
     videoMenu->addAction("切换到64画面", this, SLOT(show_video_64()));
+*/
 }
 
 void VideoPanel::full()
@@ -219,7 +240,15 @@ void VideoPanel::snapshot_video_one()
 
 void VideoPanel::snapshot_video_all()
 {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QDateTime current_date_time =QDateTime::currentDateTime();
+    QString time = current_date_time.toString("yyyy-MM-dd hh-mm-ss");
 
+    for (int i = 0; i < videoCount; i++) {
+        QString name = CommonConfig::GetInstance()->storagePic+time+"~"+QString::number(i)+".png";
+       // qDebug()<<"snapshot_video_all"<<i<<name;
+        screen->grabWindow(widgets.at(i)->winId ()).save(name);
+    }
 }
 
 void VideoPanel::show_video_all()

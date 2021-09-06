@@ -16,9 +16,9 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>100</x>
      <y>40</y>
-     <width>281</width>
+     <width>311</width>
      <height>31</height>
     </rect>
    </property>
@@ -30,7 +30,7 @@
     </font>
    </property>
    <property name="text">
-    <string>机器人辅助工具</string>
+    <string>众巡机器人巡检系统</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btn_Ok">
@@ -72,7 +72,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>客户端版本号：V2.004.0000000.9.R.20210426</string>
+    <string>客户端版本号：V2.004.0000000.9.R.20210902</string>
    </property>
   </widget>
  </widget>

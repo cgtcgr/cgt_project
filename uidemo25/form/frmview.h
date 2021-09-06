@@ -27,6 +27,8 @@ private:
 public slots:
     void getMountState(bool flag);
     void getMountPos(int pos);
+    void getMountAndSwingPos(int x, int y, int z);
+    void setInfo(int x, int y, int z, uchar errM, uchar power, short a);
 private slots:
     void initForm();
     void initTree();

@@ -3,7 +3,7 @@
 #include "mount/cmountstate.h"
 #include "sql/sqlmanager.h"
 #include <QJsonObject>
-
+#include "QsLog/QsLog.h"
  PeriodTask::PeriodTask()
  {
      m_timer = new QTimer(this);
@@ -14,87 +14,107 @@
 
 bool PeriodTask::setExecTimeList(std::list<PeriodTask::execTime> &execTimeList)
 {
+    qDebug()<<"PeriodTask::setExecTimeList";
     std::unique_lock<std::mutex> lock(m_execTimeMutex);
     m_execTimeList.swap(execTimeList);
     return true;
 }
+
 bool PeriodTask::getTaskList(std::list<taskInfo> & task)
 {
+    qDebug()<<"PeriodTask::getTaskList";
     std::unique_lock<std::mutex> lock(m_execTimeMutex);
     task = m_taskList;
     return true;
 }
 
+bool PeriodTask::getTaskInfo(QString name,taskInfo & task)
+{
+    qDebug()<<"PeriodTask::getTaskInfo";
+    std::unique_lock<std::mutex> lock(m_execTimeMutex);
+    auto it = m_taskList.begin();
+    for(; it != m_taskList.end(); it ++)
+    {
+        if(it->pointName == name)
+        {
+            task.Id = it->Id;
+            task.pointName = it->pointName;
+            task.pos = it->pos;
+            task.cameraLeftPos = it->cameraLeftPos;
+            task.cameraRightPos = it->cameraRightPos;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool PeriodTask::insertTaskList(taskInfo &values)
 {
-    qDebug()<<"PeriodTask::insertTaskList1";
-    std::unique_lock<std::mutex> lock(m_execTimeMutex);
-    if(m_taskList.size() == 0)
+    qDebug()<<"PeriodTask::insertTaskList";
     {
-        //qDebug()<<"PeriodTask::insertTaskList2";
-        values.Id = 0;
-        m_taskList.push_back(values);
-        listToJson();
-    }
-    else
-    {
-        //qDebug()<<"PeriodTask::insertTaskList3";
-        int i = 0;
-        auto it = m_taskList.begin();
-
-        for(; it != m_taskList.end();it ++)
+        std::unique_lock<std::mutex> lock(m_execTimeMutex);
+        if(m_taskList.size() == 0)
         {
-            i++;
-            if(it->pos >= values.pos)
+            values.Id = 0;
+            m_taskList.push_back(values);
+            listToJson();
+        }
+        else
+        {
+            int i = 0;
+            auto it = m_taskList.begin();
+
+            for(; it != m_taskList.end(); it ++)
             {
-                break;
+                i++;
+                if(it->pos >= values.pos)
+                {
+                    break;
+                }
             }
-        }
-        values.Id = i;
-        m_taskList.insert(it,values);
+            values.Id = i;
+            m_taskList.insert(it,values);
 
-
-        int j = 0;
-        it = m_taskList.begin();
-        for(; it != m_taskList.end();it ++)
-        {
-            it->Id = j++;
+            int j = 0;
+            it = m_taskList.begin();
+            for(; it != m_taskList.end();it ++)
+            {
+                it->Id = j++;
+            }
+            listToJson();
         }
-        listToJson();
     }
+    emit sendTaskListChange();
     return true;
 }
 
 bool PeriodTask::readTaskInfo()
 {
-    qDebug()<<"PeriodTask::readTaskInfo";
+    QLOG_INFO()<<"PeriodTask::readTaskInfo";
     QFile file("taskInfo.json");
     if(!file.open(QIODevice::ReadOnly))
     {
-        qDebug()<<"PeriodTask::readTaskInfo open file fail";
+        QLOG_INFO()<<"PeriodTask::readTaskInfo open file fail";
         return  false;
     }
     QByteArray ba = file.readAll();
-   // qDebug()<<"PeriodTask::readTaskInfo1"<<ba;
     QJsonParseError e;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(ba,&e);
     if(e.error == QJsonParseError::NoError && !jsonDoc.isNull())
     {
-       // qDebug()<<"PeriodTask::readTaskInfo2";
+        QLOG_INFO()<<"PeriodTask::readTaskInfo data fail";
         arr = jsonDoc.array();
         jsonToList();
         file.close();
         return true;
     }
-//qDebug()<<"PeriodTask::readTaskInfo3";
-      file.close();
-      return false;
-
+    file.close();
+    return false;
 }
 
 bool PeriodTask::jsonToList()
 {
-    //qDebug()<<"PeriodTask::jsonToList"<<arr.size();
+    QLOG_INFO()<<"PeriodTask::jsonToList"<<arr.size();
     std::unique_lock<std::mutex> lock(m_execTimeMutex);
     for(int i = 0 ;i< arr.size(); i++)
     {
@@ -105,6 +125,8 @@ bool PeriodTask::jsonToList()
         task.pos = value["pos"].toInt();
         task.cameraLeftPos = value["cameraLeftPos"].toInt();
         task.cameraRightPos = value["cameraRightPos"].toInt();
+        task.cathodeBarThreshold = value["cathodeBarThreshold"].toInt();
+        task.slotThreshold= value["slotThreshold"].toInt();
         m_taskList.push_back(task);
     }
     return true;
@@ -112,15 +134,11 @@ bool PeriodTask::jsonToList()
 
 bool PeriodTask::listToJson()
 {
-    qDebug()<<"PeriodTask::listToJson";
-    //std::unique_lock<std::mutex> lock(m_execTimeMutex);
-       qDebug()<<"PeriodTask::listToJson111";
+    QLOG_INFO()<<"PeriodTask::listToJson"<<m_taskList.size();
     auto it = m_taskList.begin();
-       qDebug()<<"PeriodTask::listToJson222";
     QJsonArray taskArr;
     for(; it != m_taskList.end();it ++)
     {
-        qDebug()<<"PeriodTask::listToJson1";
         QJsonObject tjson;
         QJsonObject value;
         value.insert("Id",it->Id);
@@ -128,13 +146,15 @@ bool PeriodTask::listToJson()
         value.insert("pos",it->pos);
         value.insert("cameraLeftPos",it->cameraLeftPos);
         value.insert("cameraRightPos",it->cameraRightPos);
+        value.insert("cathodeBarThreshold",it->cathodeBarThreshold);
+        value.insert("slotThreshold",it->slotThreshold);
         tjson.insert("task",value);
         QJsonValue v = tjson["task"];
         taskArr.push_back(v);
     }
     arr.swap(taskArr);
     QJsonDocument jsondoc(arr);
-    qDebug()<<"PeriodTask::listToJson2";
+
     QFile file("taskInfo.json");
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text | QFile::Truncate))
     {
@@ -144,6 +164,7 @@ bool PeriodTask::listToJson()
     file.close();
     return true;
 }
+
 //bool PeriodTask::insertTaskSql(int i , taskInfo &values)
 //{
 //    QStringList value;
@@ -178,14 +199,15 @@ bool PeriodTask::isPointNameExist(taskInfo &values)
 
 void PeriodTask::execPeriodTask()
 {
+    qDebug()<<"PeriodTask::execPeriodTask";
     if(!CMountState::GetInstance()->getAutoState())
     {
         return;
     }
-    QTime current_time =QTime::currentTime();
+    QTime current_time = QTime::currentTime();
 
     execTime info(current_time.hour(),current_time.minute());
-
+    qDebug()<<"PeriodTask::execPeriodTask"<<current_time.hour()<<current_time.minute();
     for(auto it = m_execTimeList.begin();it!=m_execTimeList.end();it++)
     {
         if(*it == info)

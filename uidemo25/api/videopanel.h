@@ -42,6 +42,8 @@ public:
     QSize sizeHint()            const;
     QSize minimumSizeHint()     const;
 
+public slots:
+    void recvSaveTaskPic(QString name, QString time1);
 private slots:
     void initControl();
     void initForm();

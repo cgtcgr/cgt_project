@@ -1,6 +1,6 @@
 #ifndef FRMESSAGEBOX_H
 #define FRMESSAGEBOX_H
-
+#include "framelesshelper.h"
 #include <QDialog>
 
 namespace Ui {

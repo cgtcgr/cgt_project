@@ -19,7 +19,10 @@ public:
         uchar hour;
         uchar min;
         uchar sec;
-        execTime(uchar h, uchar m):hour(h),min(m){}
+        execTime(uchar h,uchar m)
+        {
+            hour = h;min = m;
+        }
         bool operator ==(execTime h)
         {
             return ((hour == h.hour) && (min == h.min));
@@ -41,8 +44,11 @@ public:
     bool isPointNameExist(taskInfo &values);
     // bool insertTaskSql(int i, taskInfo &values);
     bool readTaskInfo();
+    bool getTaskInfo(QString name, taskInfo &task);
 private slots:
     void execPeriodTask();
+signals:
+    void sendTaskListChange();
 private:
     PeriodTask();
     std::mutex m_execTimeMutex;

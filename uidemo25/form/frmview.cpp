@@ -7,6 +7,7 @@
 #include <QTabWidget>
 #include "mount/cmountstate.h"
 #include "mount/mountnet.h"
+#include "userframe/animatgion.h"
 frmView::frmView(QWidget *parent) :
     QWidget(parent),
     m_robotControl(new robotControl(this)),
@@ -14,18 +15,16 @@ frmView::frmView(QWidget *parent) :
     m_hangpatrol(new hangpatrol(this))
 {
     qDebug()<<"frmView start init";
-        qDebug()<<"frmView start init.....";
-        ui = new Ui::frmView;
+    ui = new Ui::frmView;
     ui->setupUi(this);
-     qDebug()<<"frmView start init1";
     this->initForm();
-    qDebug()<<"frmView start init2";
     this->initTree();
 
     this->initNav();
-    qDebug()<<"frmView start init success";
     connect(CMountState::GetInstance(),SIGNAL(sendMountState(bool)),this ,SLOT(getMountState(bool)));
     connect(MountNet::GetInstance(),SIGNAL(mountPos(int)), this ,SLOT(getMountPos(int)));
+    connect(MountNet::GetInstance(),SIGNAL(sendMMXY(int,int,int)), this ,SLOT(getMountAndSwingPos(int,int,int)));
+    connect(MountNet::GetInstance(), SIGNAL(sendMountState(int,int ,int,uchar,uchar,short)), this, SLOT(setInfo(int,int ,int,uchar,uchar,short)));
 }
 
 frmView::~frmView()
@@ -34,18 +33,20 @@ frmView::~frmView()
 }
 void frmView::getMountPos(int pos)
 {
-    ui->lineEdit->setText(QString::number(pos));
+    //->lineEdit->setText(QString::number(pos));
+}
+
+void frmView::getMountAndSwingPos(int x,int y,int z)
+{
+    //ui->lineEdit->setText(QString::number(x)+QString(" ")+QString::number(y)+QString(" ")+QString::number(z));
+}
+void frmView::setInfo(int x, int y, int z, uchar errM, uchar power, short a)
+{
+    ui->widget_2->setInfo(x,y,z,errM,power,a);
 }
 void frmView::getMountState(bool flag)
 {
-    if(flag)
-    {
-        ui->lineEdit_2->setText("AUTO");
-    }
-    else
-    {
-        ui->lineEdit_2->setText("HAND");
-    }
+    ui->widget_2->setAuto(flag);
 }
 
 void frmView::initForm()
@@ -90,27 +91,20 @@ void frmView::initNav()
     tabWidget->addTab(m_robotControl,"机器人控制");
     tabWidget->addTab(m_autoPatrol,"自动巡检");
     tabWidget->addTab(m_hangpatrol,"手动巡检");
+    QFont font;
+    font.setFamily("微软雅黑");//字体
+    //font.setPixelSize(12);//文字像素大小
+    font.setPointSize(12);//文字大小
+    font.setBold(true);//粗体
+    //font.setLetterSpacing(QFont::PercentageSpacing,10);//间距
+    tabWidget->setFont(font);
     ui->stackedWidget->addWidget(tabWidget);
     frmDataLog *control = new frmDataLog;
     ui->stackedWidget->addWidget(control);
-
-
-    //    QList<QString> texts;
-//    texts  << "自动巡检"<<"手动巡检";
-
-//    //这里临时用qlabel加粗显示,可以改成自己的widget窗体 相机控制  挂轨控制
-//    QString qss = "font:80pt;";
-//    for (int i = 0; i < texts.count(); i++) {
-//        QLabel *lab = new QLabel;
-//        lab->setAlignment(Qt::AlignCenter);
-//        lab->setText(texts.at(i));
-//        lab->setStyleSheet(qss);
-//        lab->setAutoFillBackground(true);
-//        ui->stackedWidget->addWidget(lab);
-//    }
 }
 
 void frmView::setIndex(int index)
 {
     ui->stackedWidget->setCurrentIndex(index);
+    animatgion::wigShow(ui->stackedWidget->currentWidget(),0,3);
 }

@@ -19,6 +19,11 @@ public:
 
 public slots:
     bool updateTaskList(std::list<taskInfo> &tasklist);
+    void recvTaskListChange();
+    void recvTaskResult(QString name, QString time, int max, int min);
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::hangpatrol *ui;
 };

@@ -8,19 +8,13 @@ class tempManager
 public:
     static tempManager* getInstance();
     tempManager();
-    int m_maxT;
-    int m_minT;
-public slots:
-    void getTem(int &max, int &min)
-    {
-        max = m_maxT;
-        min = m_minT;
-    }
-    void setTem(int &max, int &min)
-    {
-       m_maxT =  max ;
-       m_minT =  min ;
-    }
+    int m_max0T;
+    int m_min0T;
+    int m_max1T;
+    int m_min1T;
+    void settem(int id, int max, int min);
+
+    void gettem(int &maxL, int &maxR);
 };
 
 #endif // TEMPMANAGER_H

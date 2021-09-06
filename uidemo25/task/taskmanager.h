@@ -6,7 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <vector>
-//
+#include <QString>
 class taskInfo
 {
     public:
@@ -35,6 +35,7 @@ class taskInfo
 
 class CTaskManager :public QThread
 {
+     Q_OBJECT
     public:
         static CTaskManager *GetInstance()
         {
@@ -45,6 +46,8 @@ class CTaskManager :public QThread
 
     protected:
         void run();
+    signals:
+        void mountPos(int);
 
     private:
         bool m_isTask;

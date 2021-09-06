@@ -25,13 +25,13 @@ frmData::~frmData()
 
 void frmData::initForm()
 {
-    ui->widgetLeft->setProperty("flag", "btnNavLeft");
-    ui->widgetLeft->setFixedWidth(AppNav::NavSubLeft ? 150 : 120);
+//    ui->widgetLeft->setProperty("flag", "btnNavLeft");
+//    ui->widgetLeft->setFixedWidth(AppNav::NavSubLeft ? 150 : 120);
 }
 
 void frmData::initNav()
 {
-    ui->stackedWidget->addWidget(new QWidget);
+   // ui->stackedWidget->addWidget(new QWidget);
 
     QList<QString> names, texts;
 //    names << "btnDataLog" << "btnDataAlarm" << "btnDataUser";
@@ -79,7 +79,7 @@ void frmData::buttonClicked()
 {
     //切换到当前窗体
     QAbstractButton *btn = (QAbstractButton *)sender();
-    ui->stackedWidget->setCurrentIndex(btns.indexOf(btn));
+   // ui->stackedWidget->setCurrentIndex(btns.indexOf(btn));
 
     //取消其他按钮选中
     foreach (QAbstractButton *b, btns) {

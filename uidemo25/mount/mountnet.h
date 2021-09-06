@@ -51,10 +51,23 @@ public:
     bool sendMoveSwingA(bool flag);
     bool sendMoveSwingB(bool flag);
     bool sendMoveStop();
-
+    bool resetmountPos()
+    {
+        PackGo0(0);
+        return true;
+    }
     bool setRoom(QString room);
-    bool sendMovePsotion(int pos, int flag);
+    bool sendMovePsotion(int pos, int flag, int posbak=0);
     bool sendMoveSpeed(int speed);
+    int getMountPos(){return m_mountPos;}
+    int getSwingAPos(){return m_swingPosA;}
+    int getSwingBPos(){return m_swingPosB;}
+
+    void PackJG(int sta);
+    bool sendSwingMoveSpeed(int speed);
+public slots:
+    void readyExcute();
+    void OnDataReady();
 private:
     MountNet();
     MountNet(QString ip, int port);
@@ -64,7 +77,7 @@ private:
     void PackStart(unsigned char dirX, int X, unsigned char dirY, int Y, unsigned char dirZ, int Z);
     void Unpack(unsigned char *buff);
     void UnpackNow(unsigned char *buff);
-
+    void PackGo0(int endmsg);
 private slots:
     void ReadData(QByteArray buffer);
     void ReadError(QAbstractSocket::SocketError);
@@ -72,8 +85,9 @@ private slots:
 signals:
     void mountPos(int);
     void sendMMXY(int,int ,int);//更新显示坐标
+    void sendMountState(int,int ,int,uchar,uchar,short);//更新显示坐标
 private:
-    QTcpSocket * m_tcpClient;
+    QTcpSocket * m_tcpSocket;
     QTimer * m_timer;
     QString m_ip;
     int m_port;
@@ -89,8 +103,11 @@ private:
     int m_swingPosA;
     int m_swingPosB;
 
+    int m_mountMostLimit;
+    int m_swingMostLimit;
 
 
+    void onSet(int endMsg);
 };
 
 #endif // MOUNTNET_H

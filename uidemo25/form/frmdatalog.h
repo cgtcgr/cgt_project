@@ -25,8 +25,18 @@ private slots:
 
     void on_m_addPointBtn_clicked();
 
+    void on_pushButton_clicked();
+
+    void on_tabWidget_currentChanged(int index);
+
 private:
     Ui::frmDataLog *ui;
+    bool m_selectMode;
+private:
+    bool readTaskInfo();
+    void updateTimeTable(QStringList &times);
+    void updateTimefile(QStringList &times);
+    void wigShow(QWidget *wig, int direct);
 };
 
 #endif // FRMDATALOG_H

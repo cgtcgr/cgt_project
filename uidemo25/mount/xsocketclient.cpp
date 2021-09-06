@@ -44,8 +44,9 @@ bool XSocketClient::SendData(QByteArray by)
     if(nullptr != m_pClientSocket)
     {
         bre = (by.size() == m_pClientSocket->write(by));
+        m_pClientSocket->flush();
     }
-   // QLOG_INFO() << "XSocketClient::SendData"<<by.toHex();
+    QLOG_INFO() << "XSocketClient::SendData"<<bre<<by.toHex();
     return bre;
 }
 

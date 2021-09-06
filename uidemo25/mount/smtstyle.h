@@ -80,7 +80,7 @@
 #define COM_LEN_IAP_DAT_NET	1030//发送继续执行命令 包括
 
 #define COM_MSG_NOW             1	//实时位置
-#define COM_MSG_CCD             2	//校正
+#define COM_MSG_GET             2	//校正
 #define COM_MSG_RUN             3	//贴装
 #define COM_MSG_HAND            4	//手动 全部的G
 #define COM_MSG_STOP            5	//停止
@@ -92,7 +92,7 @@
 #define COM_MSG_TESTFLY         11	//测试飞行相机
 #define COM_MSG_KEY             12	//按钮
 #define COM_MSG_SCURVE          13	//S曲线设置
-#define COM_MSG_ACCDFLIGHT      14	//飞行对中
+#define COM_MSG_POWEROUT        14	//电量低
 #define COM_MSG_ACCD            15	//测量吸嘴和CCD的坐标
 #define COM_MSG_PL              16	//抛料
 #define COM_MSG_LOAD            17	//飞达矫正
@@ -103,7 +103,7 @@
 #define COM_MSG_LED             22	//单独选择CCD
 #define COM_MSG_C               23	//清除XY坐标
 #define COM_MSG_RESET           24	//设备复位
-#define COM_MSG_VACUUM          25	//真空泵
+#define COM_MSG_EN              25	//清除电机的报错
 #define COM_MSG_F               26	//手动控制飞达
 #define COM_MSG_O               27	//测量原点
 #define COM_MSG_MXY             28	//测量XY范围---是用来测量原点，作为END_MSG
@@ -139,7 +139,7 @@
 
 //手动动作前先判断Z状态
 #define XZ_ENDMSG_XY            0   //手动移动XY
-#define XZ_ENDMSG_RETURN        1   //返回原点
+#define XZ_ENDMSG_GET           1   //获取标定点
 #define XZ_ENDMSG_ZD            2   //自动运行贴装时  首先判断Z位置
 #define XZ_ENDMSG_BUTIE         3   //补贴状态下首先判断Z位置 从选中行运行也先判断Z位置
 #define XZ_ENDMSG_O             4   //测量原点

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include "json/json.h"
-#include "configs/parameter/localconfigmanger.h"
+
 
 JsonEditDlg::JsonEditDlg(QString strTitle, QWidget *parent) :
     QDialog(parent),

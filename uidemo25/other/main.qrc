@@ -11,5 +11,7 @@
         <file>image/left.png</file>
         <file>image/right.png</file>
         <file>image/up.png</file>
+        <file>gif/start.gif</file>
+        <file>image/main/menu.png</file>
     </qresource>
 </RCC>

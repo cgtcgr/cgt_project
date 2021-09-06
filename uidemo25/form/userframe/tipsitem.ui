@@ -73,7 +73,7 @@
        </font>
       </property>
       <property name="text">
-       <string>机器人路障事件报警</string>
+       <string>机器人低电量报警</string>
       </property>
      </widget>
      <widget class="QLabel" name="label">

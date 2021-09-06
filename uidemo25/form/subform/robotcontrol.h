@@ -4,8 +4,7 @@
 #include <QWidget>
 #include "mount/cmountstate.h"
 #include "mount/mountnet.h"
-#include "mount/steeringnet.h"
-#include <QTimer>
+//#include <QTimer>
 namespace Ui {
 class robotControl;
 }
@@ -19,23 +18,10 @@ public:
     ~robotControl();
 
 private slots:
-    void on_front_btn_clicked();
-
-    void on_back_btn_clicked();
-
-    void on_up_btn_clicked();
-
-    void on_down_btn_clicked();
-
-    void on_up1_btn_clicked();
-
-    void on_down1_btn_clicked();
 
     void on_hand_btn_clicked();
 
     void on_auto_btn_clicked();
-
-    void on_back_btn_2_clicked();
 
     void on_front_btn_pressed();
 
@@ -45,12 +31,28 @@ private slots:
 
     void on_back_btn_released();
 
-    void updateMoveBack();
-    void updateMoveForwad();
+    void on_down_btn_pressed();
+
+    void on_down_btn_released();
+
+    void on_up_btn_pressed();
+
+    void on_up_btn_released();
+
+    void on_up1_btn_pressed();
+
+    void on_up1_btn_released();
+
+    void on_down1_btn_pressed();
+
+    void on_down1_btn_released();
+
+    void on_pushButton_clicked();
+
 private:
     Ui::robotControl *ui;
-    QTimer * m_devFront;
-    QTimer * m_devBack;
+//    QTimer * m_devFront;
+//    QTimer * m_devBack;
 };
 
 #endif // ROBOTCONTROL_H

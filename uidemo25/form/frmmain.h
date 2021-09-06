@@ -2,7 +2,8 @@
 #define FRMMAIN_H
 
 #include <QWidget>
-
+#include <QMenu>
+#include "userframe/about.h"
 class FramelessHelper;
 class QAbstractButton;
 
@@ -32,8 +33,16 @@ private:
     QList<QChar> icons;
     QList<QAbstractButton *> btns;
 
-    void initLog();
-    void initServerice();
+    /// 帮助菜单
+    QMenu *m_menu;
+    QAction *m_helpAction;
+    QAction *m_qaAction;
+    QAction *m_aboutAction;
+    QAction *m_versionAction;
+    QAction *m_setAction;
+    About *m_aboutUsDlg;
+
+    void createAboutMenu();
 private slots:
     void initForm();        //初始化界面数据
     void initNav();         //初始化导航窗体
@@ -49,6 +58,9 @@ private slots:
     void on_btnMenu_Max_clicked();
     void on_btnMenu_Close_clicked();
 
+    void OnHelpActionTriggered();
+    void OnVersionTriggered();
+    void OnAboutUsTriggered();
 signals:
     void setIndex(int index);
     void changeStyle();

@@ -2,7 +2,7 @@
 #define CMOUNTSTATE_H
 
 #include <QObject>
-
+#include "subform/mountinfoshow.h"
 class CMountState:public QObject
 {
     Q_OBJECT

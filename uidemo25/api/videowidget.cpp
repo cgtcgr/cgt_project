@@ -16,12 +16,13 @@
 #include <QMenu>
 #include <QMatrix>
 #include "QsLog.h"
-
+#include "mount/tempmanager.h"
 int VideoWidget::currentNum = 0;
 
 
 VideoWidget::VideoWidget(QWidget *parent) : QWidget(parent),
-  m_currentPoint(-1, -1)
+  m_currentPoint(-1, -1),
+  cameraId(0)
 {
     //设置强焦点
     setFocusPolicy(Qt::StrongFocus);
@@ -82,7 +83,10 @@ void VideoWidget::initThread()
 {
 
 }
-
+void VideoWidget::setCameraId(int id)
+{
+    cameraId = id;
+}
 void VideoWidget::initFlowPanel()
 {
     //顶部工具栏,默认隐藏,鼠标移入显示移除隐藏
@@ -292,7 +296,7 @@ void VideoWidget::paintEvent(QPaintEvent *)
 
 void VideoWidget::newFrameEmit(int intCameraTemperature, DWORD dwCamState)
 {
-   // QLOG_INFO()<<"VideoWidget::newFrameEmit";
+    //QLOG_INFO()<<"VideoWidget::newFrameEmit";
     emit newFrameComing(intCameraTemperature);
 }
 
@@ -305,17 +309,22 @@ void VideoWidget::process(int intCameraTemperature)
 
     const UCHAR *pData = NULL;
     const BITMAPINFO *pInfo = NULL;
-
+ //QLOG_INFO()<<"VideoWidget::process1";
     const struct_CamInfo *caminfo = m_magDev.GetCamInfo();
+    //QLOG_INFO()<<"VideoWidget::process2";
     const struct_State* pState = m_magDev.GetFrameStatisticalData();
     maxy =int(pState->intPosMax/caminfo->intFPAWidth);
     //最高温度出现位置, y=int(intPosMax/FPAWIDTH), x=intPosMax-FPAWIDTH*y, 原点在图像左下角
+   // QLOG_INFO()<<"VideoWidget::process3";
     maxx = pState->intPosMax - caminfo->intFPAWidth * maxy;
     maxTem = pState->intMaxTemperature;
     minTem = pState->intMinTemperature;
+   // QLOG_INFO()<<"VideoWidget::process4"<<maxTem<<minTem;
+    tempManager::getInstance()->settem(cameraId ,maxTem ,minTem );
+   // QLOG_INFO()<<"VideoWidget::process5";
     BOOL bTemperatureStream = m_magDev.GetOutputBMPdata(&pData, &pInfo);
     BOOL bVideoStream = m_magDev.GetOutputVideoData(&pData, &pInfo);
-
+ //QLOG_INFO()<<"VideoWidget::process6";
     if (!bTemperatureStream && !bVideoStream) {
         m_magDev.Unlock();
         return;
@@ -363,18 +372,20 @@ void VideoWidget::drawTem(QPainter *painter)
     //QLOG_INFO("VideoWidget::drawTem");
     painter->save();
     //标签位置尽量偏移多一点避免遮挡
-    QRect osdRect(maxx, this->size().height()-maxy, 40, 20);
+    QRect osdRect(maxx, this->size().height()-maxy, 100, 50);
      //QRect osdRect(0, 0, 40, 20);
     int flag = Qt::AlignLeft | Qt::AlignTop;
 
     //设置颜色及字号
     QFont font;
-    font.setPixelSize(10);
+    font.setPixelSize(30);
     QColor color;
-    color.setRgb(0,255,255,255);
+    color.setRgb(0,255,0,255);
     painter->setPen(color);
     painter->setFont(font);
-    QString text = QString::number(100);
+    double maxt = (double)maxTem/1000.0 ;
+    QString str = QString::number(maxt, 'f', 1);
+    QString text = QString("+ ") + str;
     painter->drawText(osdRect, flag, text);
 
 }

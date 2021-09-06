@@ -15,16 +15,18 @@
 #include "task/periodtask.h"
 #include "sql/sqlmanager.h"
 #include "mount/steeringnet.h"
+#include "userframe/versiondlg.h"
 frmMain::frmMain(QWidget *parent) : QWidget(parent), ui(new Ui::frmMain)
 {
     ui->setupUi(this);
-    initLog();
+    //initLog();
     this->initForm();
+    createAboutMenu();
     this->initText();
     this->initNav();
     this->initIcon();
     this->initAction();
-    this->initServerice();
+    //this->initServerice();
     QUIHelper::setFormInCenter(this);
 }
 
@@ -43,46 +45,6 @@ bool frmMain::eventFilter(QObject *watched, QEvent *event)
     }
 
     return QWidget::eventFilter(watched, event);
-}
-void frmMain::initServerice()
-{
-    sqlManager::GetInstance()->createPatrolData();
-    CTaskManager::GetInstance()->start();
-    MountNet::GetInstance()->setIpPort("200.120.72.166",6060);
-    MountNet::GetInstance()->setRoom("room1");
-     if(MountNet::GetInstance()->init())
-     {
-        QLOG_INFO() << "mount connect success";
-     }
-//ROOM1 = Room1, 200.120.72.166, 6060,200.120.72.167, 3777, 200.120.72.168, xtkj66666,200.120.72.170
-   steeringNet::GetInstance(0)->setIpPort("200.120.72.170",23);
-   steeringNet::GetInstance(1)->setIpPort("200.120.72.170",26);
-   if(steeringNet::GetInstance(0)->init())
-   {
-      QLOG_INFO() << "steer0 connect success";
-   }
-   if(steeringNet::GetInstance(1)->init())
-   {
-      QLOG_INFO() << "steer1 connect success";
-   }
-}
-void frmMain::initLog()
-{
-    using namespace QsLogging;
-    // 1. init the logging mechanism
-    Logger& logger = Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
-    const QString sLogPath(QDir(QApplication::applicationDirPath()).filePath("log.txt"));
-
-    // 2. add two destinations
-    DestinationPtr fileDestination(DestinationFactory::MakeFileDestination(
-    sLogPath, DisableLogRotation, MaxSizeBytes(1024*1024), MaxOldLogCount(2)));
-    logger.addDestination(fileDestination);
-
-    // 3. start logging
-    QLOG_INFO() << "Program started";
-    QLOG_INFO() << "Built with Qt" << QT_VERSION_STR << "running on" << qVersion();
-
 }
 void frmMain::initForm()
 {
@@ -293,4 +255,53 @@ void frmMain::on_btnMenu_Max_clicked()
 void frmMain::on_btnMenu_Close_clicked()
 {
     this->close();
+}
+void frmMain::createAboutMenu()
+{
+    m_aboutUsDlg = new About();
+    m_menu = new QMenu(this);
+
+    m_aboutAction = m_menu->addAction(tr("关于我们"));
+    connect(m_aboutAction,SIGNAL(triggered()),this,SLOT(OnAboutUsTriggered()));
+
+    m_versionAction = m_menu->addAction(tr("版本信息"));
+    connect(m_versionAction,SIGNAL(triggered()),this,SLOT(OnVersionTriggered()));
+
+    m_helpAction = m_menu->addAction(tr("使用手册"));
+    connect(m_helpAction,SIGNAL(triggered()),this,SLOT(OnHelpActionTriggered()));
+
+    ui->btnMenu_Help->setMenu(m_menu);
+    m_menu->setStyleSheet("QMenu {"
+                          "    background-color: black; "
+                          "    border: 1px solid white;"
+                          "}"
+
+                          "QMenu::item {"
+
+                         "     background-color: transparent;"
+                              "padding:8px 32px;"
+                              "margin:0px 8px;"
+                              "border-bottom:1px solid #DBDBDB;"
+                          "}"
+
+                          "QMenu::item:selected { "
+                              "background-color: #2dabf9;"
+                          "}");
+}
+void frmMain::OnHelpActionTriggered()
+{
+    //QString qtManulFile=qApp->applicationDirPath()+"/manul.pdf";
+    //QDesktopServices::openUrl(QUrl::fromLocalFile(qtManulFile));
+}
+
+void frmMain::OnAboutUsTriggered()
+{
+    m_aboutUsDlg->setAttribute(Qt::WA_ShowModal, true);
+    m_aboutUsDlg->show();
+}
+
+void frmMain::OnVersionTriggered()
+{
+    VersionDlg verDlg(this);
+    verDlg.exec();
 }

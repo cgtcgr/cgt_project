@@ -6,5 +6,4 @@ SOURCES += \
     $$PWD/basewidget.cpp \
     $$PWD/waittingwidget.cpp
 
-FORMS += \
-    $$PWD/../userframe/frmessagebox.ui
+FORMS +=

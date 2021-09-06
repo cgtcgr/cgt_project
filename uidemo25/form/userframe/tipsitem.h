@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QTimer>
-
+#include <QMutex>
 namespace Ui {
 class TipsItem;
 }
